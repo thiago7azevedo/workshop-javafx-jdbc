@@ -15,6 +15,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import model.services.DepartmentService;
 
 public class MainViewControllew implements Initializable {
 
@@ -31,7 +32,7 @@ public class MainViewControllew implements Initializable {
 	}
 	@FXML
 	public void onMenuItemDepartmentAction() {
-		loadView("/gui/DepartmentList.fxml");
+		loadView2("/gui/DepartmentList.fxml");
 	}
 	@FXML
 	public void onMenuItemAboutAction() {
@@ -65,4 +66,32 @@ public class MainViewControllew implements Initializable {
 			}
 		}
 	
+	private synchronized void loadView2(String absolutName) { // cria uma função loadView para carregar a scena principal pasando string FXML
+		//	synchronized garante que todo o processamento não seja interrompido antes do fim ???
+			try {
+												// get class padrão + origem absoluteName
+				FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName)); // pra carregar tela chama FXMLLoader
+				VBox newVBox = loader.load();//objeto tipo Vbox e recebe o loader.load pra carregar a view, objeto criado para leitura
+				
+				Scene mainScene = Main.getMainScene(); // instancia a sceena na variavel mainScene e chama o método criado no program principal
+				VBox mainVBox = (VBox)((ScrollPane)mainScene.getRoot()).getContent(); //cria um objeto vBox, pegando a scena do MainView
+												// get root = primeiro ato do main view que é um scrollpane e depois busca o segundo que é content
+				//depois de buscar o primeiro e segundo do main view, faz um casting de scrollpane e um casting de tudo de VBox
+				Node mainMenu = mainVBox.getChildren().get(0);//cria um objeto Node que são as ramificações do vBox
+				//buscando a children ou crianças o conteudo dentro do VBox e pegando o peimeiro filho do menu campo get 0
+				mainVBox.getChildren().clear(); // depois de pegar o conteudo a cima, ele faz um clear para limpar o childrem do main view
+				mainVBox.getChildren().add(mainMenu);//add novo children pego na about e colocado na varivel mainMenu
+				mainVBox.getChildren().addAll(newVBox.getChildren()); //
+			
+				DepartmentListContoller controller = loader.getController(); // cria um controle com o tipo de DepartmentListContoller
+				//classe de controle onde tenmos o método de update. Recebe o loader.getcontroller para poder carregar a tabela
+				controller.setDepartmentService(new DepartmentService());//após feita a injeção de dependencia acima em controller
+				//abre o departmentService passando um novo objeto service para poder ter acesso ao método update
+				controller.updateTableView(); // chama o método update carregando os dados na tabela e mostrando no SceneBuilder
+				
+				}
+			catch (IOException e) {
+				Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
+				}
+			}
 }
