@@ -18,8 +18,8 @@ public class Main extends Application {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainView.fxml"));
 			ScrollPane scrollPane = loader.load();
 			
-			scrollPane.setFitToHeight(true);
-			scrollPane.setFitToWidth(true);
+			scrollPane.setFitToHeight(true); //a barra do scrollpane acompanha a largura da teabela no height
+			scrollPane.setFitToWidth(true); //a barra do scrollpane acompanha a largura da teabela no widht
 						
 			mainScene = new Scene(scrollPane); // criamos a referenca da scena 
 			primaryStage.setScene(mainScene);// colocamos a scena no palco

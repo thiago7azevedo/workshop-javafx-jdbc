@@ -39,7 +39,7 @@ public class MainViewControllew implements Initializable {
 	}
 		
 	@Override
-	public void initialize(URL uri, ResourceBundle rb) { // o initializable implementado na classe, chama este método
+	public void initialize(URL url, ResourceBundle rb) { // o initializable implementado na classe, chama este método
 	}
 
 	private synchronized void loadView(String absolutName) { // cria uma função loadView para carregar a scena principal pasando string FXML
