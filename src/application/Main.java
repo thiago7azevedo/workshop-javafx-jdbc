@@ -4,12 +4,14 @@ import java.io.IOException;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+	
+	private static Scene mainScene;	//expondo a referencia da scena pelo atributo, para guardar a referencia
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -18,10 +20,9 @@ public class Main extends Application {
 			
 			scrollPane.setFitToHeight(true);
 			scrollPane.setFitToWidth(true);
-			
-			
-			Scene mainScene = new Scene(scrollPane);
-			primaryStage.setScene(mainScene);
+						
+			mainScene = new Scene(scrollPane); // criamos a referenca da scena 
+			primaryStage.setScene(mainScene);// colocamos a scena no palco
 			primaryStage.setTitle("Sample JavaFX application");
 			primaryStage.show();
 		} catch (IOException e) {
@@ -29,6 +30,10 @@ public class Main extends Application {
 		}
 	}
 
+	public static Scene getMainScene() {
+		return mainScene; // cria um método para retornar o mainScene, pq o atributo é private
+	}
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
