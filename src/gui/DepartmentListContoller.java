@@ -49,7 +49,8 @@ public class DepartmentListContoller implements Initializable {
 	@FXML 
 	public void onBtNewAction(ActionEvent event) { // precisa passar o event para ter referencia, para poder acessar o stage
 		Stage parentStage = Utils.currentStage(event); //passa o event nesse método que foi criado no de
-		createDialogForm("/gui/DepartmentForm.fxml", parentStage); //abre o formulario DepartmentForm.fxml e diz qual janela abrir
+		Department obj = new Department();
+		createDialogForm(obj, "/gui/DepartmentForm.fxml", parentStage); //abre o formulario DepartmentForm.fxml e diz qual janela abrir
 	}
 	
 	public void setDepartmentService(DepartmentService service) { //deixa pronto um método para acesso externo, injeção de dependencia
@@ -85,11 +86,16 @@ public class DepartmentListContoller implements Initializable {
 		tableViewDepartment.setItems(obsList);
 	}
 								// tem que falarqual nome da view que vai carregar
-	private void createDialogForm(String absolutName, Stage parentStage) {
+	private void createDialogForm(Department obj, String absolutName, Stage parentStage) {
 		try {								
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName));
 			Pane pane = loader.load();// chama painel carregando o load
 			// para carregar uma janela de dialogo modal na frente da jenela existente, precisa instanciar um novo stage
+			
+			DepartmentFormController controller = loader.getController();
+			controller.setDepartment(obj);
+			controller.updateFormData();
+			
 			Stage dialogStage = new Stage(); // cria um palco na frente do outro
 			dialogStage.setTitle("Enter Department Data"); // titulo da janela
 			dialogStage.setScene(new Scene(pane)); //seta a scena do stage, nova scena onde o elemnto raiz é o pane
