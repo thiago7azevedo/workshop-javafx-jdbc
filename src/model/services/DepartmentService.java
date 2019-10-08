@@ -15,4 +15,12 @@ public class DepartmentService {
 		return dao.findAll();
 	}
 	
+	public void saveOrUpdate(Department obj) { // método para verificar se vamos inserir um departamento no Banco de dados ou atualizar
+		if(obj.getId() == null) {
+			dao.insert(obj); // se for nulo, ele insere
+		} else {
+			dao.update(obj); // se o dep ja estiver id, ja tem no BD. Ai voce atualiza
+		}
+	}
+	
 }
