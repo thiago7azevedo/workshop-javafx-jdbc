@@ -1,6 +1,7 @@
 package gui;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -41,7 +42,16 @@ public class SellerListController implements Initializable, DataChangeListener {
 	private TableColumn<Seller, Integer> tableColumnId; // cria a tabela Seller com o seu respectivo nome ID
 
 	@FXML
-	private TableColumn<Seller, Integer> tableColumnName; // cria a tabela Seller com o seu respectivo nome NAME
+	private TableColumn<Seller, String> tableColumnName; // cria a tabela Seller com o seu respectivo nome NAME
+	
+	@FXML
+	private TableColumn<Seller, String> tableColumnEmail;
+	
+	@FXML
+	private TableColumn<Seller, Date> tableColumnBirthDate;
+	
+	@FXML
+	private TableColumn<Seller, Double> tableColumnBaseSalary;
 
 	@FXML
 	private TableColumn<Seller, Seller> tableColumnEDIT; // chama método que insere um botão de edição em cada
@@ -79,7 +89,13 @@ public class SellerListController implements Initializable, DataChangeListener {
 	private void initializeNodes() { // padrão do JAVA FX para inicar o comportamento das colunas
 		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id")); // passa o nome da coluna que é "id"
 		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name")); // passa o nome da coluna que é "name"
-
+		tableColumnEmail.setCellValueFactory(new PropertyValueFactory<>("email")); // ...
+		tableColumnBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));//...
+		Utils.formatTableColumnDate(tableColumnBirthDate, "dd/MM/yyyy");
+		tableColumnBaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));//...
+		Utils.formatTableColumnDouble(tableColumnBaseSalary, 2);
+		
+		
 		Stage stage = (Stage) Main.getMainScene().getWindow(); // cria um obj Stage, que busca a scena no método
 																// getMainScene()
 		// depois busca a janela no getWindow() que é uma superclasse de Stage
