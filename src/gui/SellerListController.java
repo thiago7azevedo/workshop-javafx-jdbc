@@ -42,7 +42,6 @@ public class SellerListController implements Initializable, DataChangeListener {
 	@FXML
 	private TableView<Seller> tableViewSeller; // cria a tabela Seller com o nome da TableView do
 														// SceneBuilder
-
 	@FXML
 	private TableColumn<Seller, Integer> tableColumnId; // cria a tabela Seller com o seu respectivo nome ID
 
@@ -61,11 +60,9 @@ public class SellerListController implements Initializable, DataChangeListener {
 	@FXML
 	private TableColumn<Seller, Seller> tableColumnEDIT; // chama método que insere um botão de edição em cada
 																	// row (linha)
-
 	@FXML
 	private TableColumn<Seller, Seller> tableColumnREMOVE; // chama um metodo que insere um botão de remover o
 																	// departamento em cada row
-
 	@FXML
 	private Button btNew; // atributo para o botão criado na SceneBuilder
 
@@ -134,11 +131,12 @@ public class SellerListController implements Initializable, DataChangeListener {
 			// para carregar uma janela de dialogo modal na frente da jenela existente,
 			// precisa instanciar um novo stage
 
-			SellerFormController controller = loader.getController();
+			SellerFormController controller = loader.getController(); // injeta a classe SellerFormController para pegar as dependencias e dar o start aqui
 			controller.setSeller(obj);
-			controller.setSellerService(new SellerService());
-			controller.subscrbeDataChangeListener(this);
-			controller.updateFormData();
+			controller.setSellerServices(new SellerService());
+			//controller.loadAssociatedObjects(); // carrega, associa a o formulario de departamentos na lista de vendedores e deixa no controlle
+			controller.subscrbeDataChangeListener(this);// mostra que fala deste objeto
+			controller.updateFormData(); // inicia a formatação da data
 
 			Stage dialogStage = new Stage(); // cria um palco na frente do outro
 			dialogStage.setTitle("Enter Seller Data"); // titulo da janela
