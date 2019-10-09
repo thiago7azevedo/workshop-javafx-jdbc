@@ -1,6 +1,5 @@
 package gui;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -16,9 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -26,51 +23,49 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Pane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import model.entities.Department;
-import model.services.DepartmentService;
+import model.entities.Seller;
+import model.services.SellerService;
 
-public class DepartmentListContoller implements Initializable, DataChangeListener {
+public class SellerListController implements Initializable, DataChangeListener {
 
-	private DepartmentService service; // não instancia direto pelo new, mas sim cria uma injeção de dependencia
+	private SellerService service; // não instancia direto pelo new, mas sim cria uma injeção de dependencia
 										// através de
-										// um método criado abvaixo com setDepartmentService.
+										// um método criado abvaixo com setSellerService.
 
 	@FXML
-	private TableView<Department> tableViewDepartment; // cria a tabela Department com o nome da TableView do
+	private TableView<Seller> tableViewSeller; // cria a tabela Seller com o nome da TableView do
 														// SceneBuilder
 
 	@FXML
-	private TableColumn<Department, Integer> tableColumnId; // cria a tabela Department com o seu respectivo nome ID
+	private TableColumn<Seller, Integer> tableColumnId; // cria a tabela Seller com o seu respectivo nome ID
 
 	@FXML
-	private TableColumn<Department, Integer> tableColumnName; // cria a tabela Department com o seu respectivo nome NAME
+	private TableColumn<Seller, Integer> tableColumnName; // cria a tabela Seller com o seu respectivo nome NAME
 
 	@FXML
-	private TableColumn<Department, Department> tableColumnEDIT; // chama método que insere um botão de edição em cada
+	private TableColumn<Seller, Seller> tableColumnEDIT; // chama método que insere um botão de edição em cada
 																	// row (linha)
 
 	@FXML
-	private TableColumn<Department, Department> tableColumnREMOVE; // chama um metodo que insere um botão de remover o
+	private TableColumn<Seller, Seller> tableColumnREMOVE; // chama um metodo que insere um botão de remover o
 																	// departamento em cada row
 
 	@FXML
 	private Button btNew; // atributo para o botão criado na SceneBuilder
 
-	private ObservableList<Department> obsList;
+	private ObservableList<Seller> obsList;
 
 	@FXML
 	public void onBtNewAction(ActionEvent event) { // precisa passar o event para ter referencia, para poder acessar o
 													// stage
 		Stage parentStage = Utils.currentStage(event); // passa o event nesse método que foi criado no de
-		Department obj = new Department();
-		createDialogForm(obj, "/gui/DepartmentForm.fxml", parentStage); // abre o formulario DepartmentForm.fxml e diz
+		Seller obj = new Seller();
+		createDialogForm(obj, "/gui/SellerForm.fxml", parentStage); // abre o formulario SellerForm.fxml e diz
 																		// qual janela abrir
 	}
 
-	public void setDepartmentService(DepartmentService service) { // deixa pronto um método para acesso externo, injeção
+	public void setSellerService(SellerService service) { // deixa pronto um método para acesso externo, injeção
 																	// de dependencia
 		this.service = service; // principio solid, inversão de controle
 	}
@@ -90,7 +85,7 @@ public class DepartmentListContoller implements Initializable, DataChangeListene
 		// depois busca a janela no getWindow() que é uma superclasse de Stage
 		// depois faz um DownCasing colocando Stage na frente
 
-		tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());// macete para o tableView acompanhar a
+		tableViewSeller.prefHeightProperty().bind(stage.heightProperty());// macete para o tableView acompanhar a
 																				// janela da scena
 		// passando o stage criado a cima chamado a getWindow, e sua heightProperty.
 
@@ -101,42 +96,42 @@ public class DepartmentListContoller implements Initializable, DataChangeListene
 		if (service == null) {
 			throw new IllegalStateException("Service was null");
 		}
-		List<Department> list = service.findAll(); // lista de department lits e pega todos os dados feitos na classe
-													// DepartmentSericve
+		List<Seller> list = service.findAll(); // lista de department lits e pega todos os dados feitos na classe
+													// SellerSericve
 		obsList = FXCollections.observableArrayList(list); // carrego a lista criada dentro da obsList. Instancia o
 															// obsLIst pegando os dados originais da lista
-		tableViewDepartment.setItems(obsList);
+		tableViewSeller.setItems(obsList);
 		initEditButtons();
 		initRemoveButtons();
 	}
 
 	// tem que falarqual nome da view que vai carregar
-	private void createDialogForm(Department obj, String absolutName, Stage parentStage) {
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName));
-			Pane pane = loader.load();// chama painel carregando o load
-			// para carregar uma janela de dialogo modal na frente da jenela existente,
-			// precisa instanciar um novo stage
-
-			DepartmentFormController controller = loader.getController();
-			controller.setDepartment(obj);
-			controller.setDepartmentService(new DepartmentService());
-			controller.subscrbeDataChangeListener(this);
-			controller.updateFormData();
-
-			Stage dialogStage = new Stage(); // cria um palco na frente do outro
-			dialogStage.setTitle("Enter Department Data"); // titulo da janela
-			dialogStage.setScene(new Scene(pane)); // seta a scena do stage, nova scena onde o elemnto raiz é o pane
-			dialogStage.setResizable(false);// janela não pode ser redimensionada
-			dialogStage.initOwner(parentStage); // o stage pai da janela é o parentStage
-			dialogStage.initModality(Modality.WINDOW_MODAL); // método que diz se vai ser modal ou outro comportamento
-			// vai ficar travada, enquanto nao fechar ela nao acessa a enterior
-			dialogStage.showAndWait();// executa a função pra carreghar a janela do formulario e preencher o
-										// departamento
-
-		} catch (IOException e) {
-			Alerts.showAlert("IO Exception", "Error loading error", e.getMessage(), AlertType.ERROR);
-		}
+	private void createDialogForm(Seller obj, String absolutName, Stage parentStage) {
+//		try {
+//			FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName));
+//			Pane pane = loader.load();// chama painel carregando o load
+//			// para carregar uma janela de dialogo modal na frente da jenela existente,
+//			// precisa instanciar um novo stage
+//
+//			SellerFormController controller = loader.getController();
+//			controller.setSeller(obj);
+//			controller.setSellerService(new SellerService());
+//			controller.subscrbeDataChangeListener(this);
+//			controller.updateFormData();
+//
+//			Stage dialogStage = new Stage(); // cria um palco na frente do outro
+//			dialogStage.setTitle("Enter Seller Data"); // titulo da janela
+//			dialogStage.setScene(new Scene(pane)); // seta a scena do stage, nova scena onde o elemnto raiz é o pane
+//			dialogStage.setResizable(false);// janela não pode ser redimensionada
+//			dialogStage.initOwner(parentStage); // o stage pai da janela é o parentStage
+//			dialogStage.initModality(Modality.WINDOW_MODAL); // método que diz se vai ser modal ou outro comportamento
+//			// vai ficar travada, enquanto nao fechar ela nao acessa a enterior
+//			dialogStage.showAndWait();// executa a função pra carreghar a janela do formulario e preencher o
+//										// departamento
+//
+//		} catch (IOException e) {
+//			Alerts.showAlert("IO Exception", "Error loading error", e.getMessage(), AlertType.ERROR);
+//		}
 	}
 
 	@Override
@@ -146,11 +141,11 @@ public class DepartmentListContoller implements Initializable, DataChangeListene
 
 	private void initEditButtons() {
 		tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-		tableColumnEDIT.setCellFactory(param -> new TableCell<Department, Department>() {
+		tableColumnEDIT.setCellFactory(param -> new TableCell<Seller, Seller>() {
 			private final Button button = new Button("edit");
 
 			@Override
-			protected void updateItem(Department obj, boolean empty) {
+			protected void updateItem(Seller obj, boolean empty) {
 				super.updateItem(obj, empty);
 				if (obj == null) {
 					setGraphic(null);
@@ -158,18 +153,18 @@ public class DepartmentListContoller implements Initializable, DataChangeListene
 				}
 				setGraphic(button);
 				button.setOnAction(
-						event -> createDialogForm(obj, "/gui/DepartmentForm.fxml", Utils.currentStage(event)));
+						event -> createDialogForm(obj, "/gui/SellerForm.fxml", Utils.currentStage(event)));
 			}
 		});
 	}
 
 	private void initRemoveButtons() {
 		tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-		tableColumnREMOVE.setCellFactory(param -> new TableCell<Department, Department>() {
+		tableColumnREMOVE.setCellFactory(param -> new TableCell<Seller, Seller>() {
 			private final Button button = new Button("remove");
 
 			@Override
-			protected void updateItem(Department obj, boolean empty) {
+			protected void updateItem(Seller obj, boolean empty) {
 				super.updateItem(obj, empty);
 				if (obj == null) {
 					setGraphic(null);
@@ -181,7 +176,7 @@ public class DepartmentListContoller implements Initializable, DataChangeListene
 		});
 	}
 
-	private void removeEntity(Department obj) {
+	private void removeEntity(Seller obj) {
 		Optional<ButtonType> result = Alerts.showConfirmation("Confirmation", "Are you sure to delete?"); //cria uma confirmação com titulo e pergunta
 		//se de fato quer excluir o departamento
 		//Optional é um objeto que carrega outro objeto dentro dele, estando presente ou não. Para chamar precisa do .get().
