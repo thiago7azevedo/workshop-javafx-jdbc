@@ -22,5 +22,8 @@ public class DepartmentService {
 			dao.update(obj); // se o dep ja estiver id, ja tem no BD. Ai voce atualiza
 		}
 	}
+	public void remove(Department obj) { // remove um departamento do Banco de dados
+		dao.deleteById(obj.getId());
+	}
 	
 }
