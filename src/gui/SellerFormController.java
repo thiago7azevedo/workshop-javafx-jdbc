@@ -1,9 +1,11 @@
 package gui;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -110,7 +112,7 @@ public class SellerFormController implements Initializable {
 			notifyDataChangeListeners();
 			Utils.currentStage(event).close();
 		} catch (ValidationException e) {
-			setErrorMessages(e.getErros());
+			setErrorMessages(e.getErrors());
 		} catch (DbException e) {
 			Alerts.showAlert("Error saving object", null, e.getMessage(), AlertType.ERROR);
 		}
@@ -121,21 +123,43 @@ public class SellerFormController implements Initializable {
 			listener.onDataChanged();
 	}
 
-	private Seller getFormData() {
+	private Seller getFormData() { // método pega os dados que foram preenchidos no formulario e carrega um objet com esses dados, retornanro no fim
 		Seller obj = new Seller();
 
 		ValidationException exception = new ValidationException("Validation error");
-		obj.setId(Utils.tryParseToInt(txtId.getText()));
+		obj.setId(Utils.tryParseToInt(txtId.getText())); //pega o campo id para o campo ID do objeto, já convertido para inteiro em Utils
 
-		if (txtName.getText() == null || txtName.getText().trim().equals("")) {
+		if (txtName.getText() == null || txtName.getText().trim().equals("")) { // testa se o camo nome eh nulo ou vazio antes de ir para o obj
 //			 verifica se o campo name esta vazio,	// caso seja true ele add um erro e
 //			 repassa a super classe
 //			compara o get text (nome) se é nulo e get text (nome) usando o trim para eliminar espaço em branco, sendo que se for igual comparando com .equals "" (vazio)
 			exception.addError("name", "Field can't be empty");
 		}
 		obj.setName(txtName.getText());
-
-		if (exception.getErros().size() > 0) { // verifica se existem erros na coleção de exceção e se tiver ele reorna
+		
+		
+		if (txtEmail.getText() == null || txtEmail.getText().trim().equals("")) { //testa se o camo email eh nulo ou vazio antes de ir para o obj
+			exception.addError("email", "Field can't be empty");
+		}
+		obj.setEmail(txtEmail.getText());
+		
+		if(dpBirthDate.getValue() == null) {
+			exception.addError("birthDate", "Field can't be empty");
+		}
+		else {
+			
+		Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+		//converte o valor da hora local setado n PC do usuário, neste caso DatePicker, para uma variavel instnt independente de local
+		obj.setBirthDate(Date.from(instant)); //seta em obj a data, antes formatando para DATE
+		}
+		if (txtBaseSalary.getText() == null || txtBaseSalary.getText().trim().equals("")) {
+			exception.addError("baseSalary", "Field can't be empty");
+		}
+		obj.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));// pega o campo saláro e seta no baseSalary, isso já convertido em Utils		
+		
+		obj.setDepartment(comboBoxDepartment.getValue());		
+		
+		if (exception.getErrors().size() > 0) { // verifica se existem erros na coleção de exceção e se tiver ele reorna
 												// a exceção personalizada, caso contrário, prossegue com o método
 												// e retrna o obj.
 			throw exception;
@@ -181,51 +205,63 @@ public class SellerFormController implements Initializable {
 			// desta classe LocalDate, que usa
 			// ZoneId.systemDefault() para setar a data local da maquina do cliente
 		}
-//		if (entity.getDepartment() == null) { // teste se od epartamento criado está nulo!
-//			
-//			comboBoxDepartment.getSelectionModel().selectFirst();// se estiver ele pega o prmeiro campo ou parametro do combobox
-//		}
-//		else {
-//		comboBoxDepartment.setValue(entity.getDepartment()); // caso não esteja nuo, aí sim ele busca o deparatmento inteiro e passa para o combobox
-//		}
-//	}
-//
-//	public void loadAssociatedObjects() { // método criado para chamar a criação da lista de departamentos criada nesta
-//											// classe, através do comoBox que precisa do ObservableList
-//		if (departmentService == null) {
-//			throw new IllegalStateException("DepartmentService was null");
-//		}
-//		List<Department> list = departmentService.findAll(); // recebendo a lista dentro deste parametro
-//																// FXCollections.observableArrayList(list)
-//		obsList = FXCollections.observableArrayList(list);// parametro padrão do combobox e ObservableList
-//		comboBoxDepartment.setItems(obsList);// add a lista através do ObservableList dentro do comoBox detando os itens
-		
-		if (entity.getDepartment() == null) {
-			comboBoxDepartment.getSelectionModel().selectFirst();
+	
+		if (entity.getDepartment() == null) { // teste se od epartamento criado está nulo
+			comboBoxDepartment.getSelectionModel().selectFirst(); // se estiver ele pega o prmeiro campo ou parametro do combobox
 		}
 		else {
-		comboBoxDepartment.setValue(entity.getDepartment());
+		comboBoxDepartment.setValue(entity.getDepartment()); // caso não esteja nulo, aí sim ele busca o deparatmento inteiro e passa para o combobox
 		}
 	}
 
-	public void loadAssociatedObjects() {
+	public void loadAssociatedObjects() { // método criado para chamar a criação da lista de departamentos desta classe, através do comoBox que precisa do ObservableList
 		if (departmentService == null) {
 			throw new IllegalStateException("DepartmentService was null!!");
 		}
-		List<Department> list = departmentService.findAll();
-		obsList = FXCollections.observableArrayList(list);
-		comboBoxDepartment.setItems(obsList);
+		List<Department> list = departmentService.findAll(); // recebendo a lista dentro deste parametro
+		obsList = FXCollections.observableArrayList(list); // parametro padrão do combobox e ObservableList
+		comboBoxDepartment.setItems(obsList);// add a lista através do ObservableList dentro do comoBox detando os itens
 	}
 
 	private void setErrorMessages(Map<String, String> errors) {
 		Set<String> fields = errors.keySet();
 
-		if (fields.contains("name")) {
-			labelErrorName.setText(errors.get("name"));
-		}
-	}
+		labelErrorName.setText((fields.contains("name") ? errors.get("name") : ""));
+		
+//		if (fields.contains("name")) {
+//			labelErrorName.setText(errors.get("name"));
+//		}
+//		else {
+//			labelErrorName.setText("");
+//		}
+		
+		labelErrorEmail.setText((fields.contains("email") ? errors.get("email") : ""));
+		
+//		if (fields.contains("email")) {
+//			labelErrorEmail.setText(errors.get("email"));
+//		}
+//		else {
+//		labelErrorEmail.setText("");
 
-	private void initializeComboBoxDepartment() {
+		labelErrorBaseSalary.setText((fields.contains("baseSalary") ? errors.get("baseSalary") : ""));
+		
+//		if (fields.contains("baseSalary")) {
+//			labelErrorBaseSalary.setText(errors.get("baseSalary"));
+//		}
+//		else {
+//		labelErrorBaseSalary.setText("");
+		
+		labelErrorBaseSalary.setText((fields.contains("baseSalary") ? errors.get("baseSalary") : ""));
+//		
+//		if (fields.contains("birthDate")) {
+//			labelErrorBirthDate.setText(errors.get("birthDate"));
+//		}
+//		else {
+//		labelErrorBirthDate.setText("");
+//	}
+	}
+	
+	private void initializeComboBoxDepartment() {// inicializa o comboBox /////
 		Callback<ListView<Department>, ListCell<Department>> factory = lv -> new ListCell<Department>() {
 			@Override
 			protected void updateItem(Department item, boolean empty) {
@@ -238,15 +274,3 @@ public class SellerFormController implements Initializable {
 	}
 
 }
-
-//	private void initializeComboBoxDepartment() { // inicializa o comboBox /////////////###########################################
-//		Callback<ListView<Department>, ListCell<Department>> factory = lv -> new ListCell<Department>() {
-//			@Override
-//			protected void updateItem(Department item, boolean empty) {
-//				super.updateItem(item, empty);
-//				setText(empty ? "" : item.getName());
-//			}
-//		};
-//		comboBoxDepartment.setCellFactory(factory);
-//		comboBoxDepartment.setButtonCell(factory.call(null));
-//	}

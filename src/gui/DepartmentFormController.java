@@ -70,7 +70,7 @@ public class DepartmentFormController implements Initializable{
 		}
 		
 		catch (ValidationException e) {
-			setErrorMessages(e.getErros());
+			setErrorMessages(e.getErrors());
 		}
 		catch (DbException e) {
 			Alerts.showAlert("Error saving projects", null, e.getMessage(), AlertType.ERROR);
@@ -98,7 +98,7 @@ public class DepartmentFormController implements Initializable{
 		}
 		obj.setName(txtName.getText());
 		
-		if(exception.getErros().size() > 0) { // verifica se existem erros na coleção de exceção e se tiver ele reorna a exceção personalizada, caso contrário, prossegue com o método
+		if(exception.getErrors().size() > 0) { // verifica se existem erros na coleção de exceção e se tiver ele reorna a exceção personalizada, caso contrário, prossegue com o método
 											// e retrna o obj.
 			throw exception;
 		}

@@ -21,7 +21,7 @@ public class Utils {
 		// para o event da actionEvent pegar a source + scene + window, faz um casting
 		// de Node e um casting de tudo para Stage
 	}
-
+				// método parao ID
 	public static Integer tryParseToInt(String str) { // método para converter o valor da caixa para inteiro
 		try {
 			return Integer.parseInt(str); // se estiver tudo certo e o valor for correto, ele retorna o numero
@@ -31,7 +31,17 @@ public class Utils {
 			return null;
 		}
 	}
-
+	// método parao salário
+	public static Double tryParseToDouble(String str) { // método para converter o valor da caixa para double
+		try {
+			return Double.parseDouble(str); // se estiver tudo certo e o valor for correto, ele retorna o numero convcertido em double
+											
+		} catch // caso haja alguma exceção, ele retorna nulo abaixo
+		(NumberFormatException e) {
+			return null;
+		}
+	}
+	
 	public static <T> void formatTableColumnDate(TableColumn<T, Date> tableColumn, String format) {
 		tableColumn.setCellFactory(column -> {
 			TableCell<T, Date> cell = new TableCell<T, Date>() {
